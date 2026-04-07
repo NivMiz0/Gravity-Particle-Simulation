@@ -1,0 +1,95 @@
+#pragma kernel SimulateParticles
+#pragma kernel RenderSimulation
+
+RWTexture2D<float4> Result;
+
+float4 BGColor;
+int WIDTH;
+int HEIGHT;
+ 
+struct Planet
+{
+    float2 position;
+    float radius;
+};
+RWStructuredBuffer<Planet> Planets;
+int NumPlanets;
+
+struct Particle
+{
+    float2 position;
+    float2 velocity;
+};
+RWStructuredBuffer<Particle> Particles;
+int NumParticles;
+
+float2 WorldToUV(float2 world)
+{
+    return world + float2(WIDTH/2, HEIGHT/2);
+}
+
+float4 RenderScene(uint2 pos)
+{
+    for(int i = 0; i < NumPlanets; i++)
+    {
+        if(distance(pos, WorldToUV(Planets[i].position)) < Planets[i].radius)
+        {
+            return float4(1.0, 0.0, 0.0, 1.0);
+        } 
+    }
+    for(int j = 0; j < NumParticles; j++)
+    {
+        if(distance(pos, WorldToUV(Particles[j].position)) < 0.7 && NumParticles != 1 /*Zero length buffer guard*/)
+        {
+            return float4(1.0, 1.0, 1.0,1.0);
+        }
+    }
+
+    return BGColor;
+}
+
+Planet FindClosestPlanet(float2 pos)
+{
+    Planet closest = Planets[0];
+    float minDist = distance(closest.position, pos);
+    for(int i = 0; i < NumPlanets; i++)
+    {
+        float d = distance(pos, Planets[i].position);
+        if(d < minDist)
+        {
+            closest = Planets[i];
+            minDist = d;
+        } 
+    }
+    return closest;
+}
+
+float2 GravityOnParticle(float2 pos)
+{
+    const float G = 2;
+    float2 velocity = float2(0.0, 0.0); 
+    for(int i = 0; i < NumPlanets; i++)
+    {
+        Planet body = Planets[i];
+        float r = distance(pos, body.position);
+        float force = G*body.radius*1.0/pow(r, 2);
+        velocity += force*normalize(body.position - pos);
+    }
+    return velocity;
+}
+
+[numthreads(8,1,1)] 
+void SimulateParticles (uint3 id : SV_DispatchThreadID)
+{
+    if(NumParticles == 1){ return; /* zero length buffer guard*/ }
+    Particle p = Particles[id.x];
+
+    Particles[id.x].velocity += GravityOnParticle(p.position);
+    Particles[id.x].position += Particles[id.x].velocity;
+}
+
+[numthreads(8,8,1)] 
+void RenderSimulation (uint3 id : SV_DispatchThreadID)
+{
+    Result[id.xy] = RenderScene(id.xy);
+}
