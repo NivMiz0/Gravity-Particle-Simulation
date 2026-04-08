@@ -4,14 +4,16 @@ public struct Planet
 {
     public Vector2 position;
     public float radius;
+    public float mass;
     public static int GetSize()
     {
-        return sizeof(float)*3;
+        return sizeof(float)*4;
     }
-    public Planet(Vector2 position, float radius)
+    public Planet(Vector2 position, float radius, float mass)
     {
         this.position = position;
         this.radius = radius;
+        this.mass = mass;
     }
 }
 

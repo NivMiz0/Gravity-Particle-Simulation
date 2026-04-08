@@ -11,6 +11,7 @@ struct Planet
 {
     float2 position;
     float radius;
+    float mass;
 };
 RWStructuredBuffer<Planet> Planets;
 int NumPlanets;
@@ -39,7 +40,7 @@ float4 RenderScene(uint2 pos)
     }
     for(int j = 0; j < NumParticles; j++)
     {
-        if(distance(pos, WorldToUV(Particles[j].position)) < 0.7 && NumParticles != 1 /*Zero length buffer guard*/)
+        if(distance(pos, WorldToUV(Particles[j].position)) < 2 && NumParticles != 1 /*Zero length buffer guard*/)
         {
             return float4(1.0, 1.0, 1.0,1.0);
         }
@@ -66,25 +67,41 @@ Planet FindClosestPlanet(float2 pos)
 
 float2 GravityOnParticle(float2 pos)
 {
-    const float G = 2;
+    const float G = 2; // Arbitrary "Universal gravity constant" 
     float2 velocity = float2(0.0, 0.0); 
     for(int i = 0; i < NumPlanets; i++)
     {
         Planet body = Planets[i];
         float r = distance(pos, body.position);
-        float force = G*body.radius*1.0/pow(r, 2);
+        float force = G*body.mass*1.0/pow(r, 2);
         velocity += force*normalize(body.position - pos);
     }
     return velocity;
 }
 
-[numthreads(8,1,1)] 
+float2 CollideWithBodies(Particle p)
+{
+    for(int i = 0; i < NumPlanets; i++)
+    {
+        Planet body = Planets[i];
+        if(distance(p.position, body.position) < body.radius)
+        {
+            float2 normal = normalize(p.position - body.position);
+            return normal*length(p.velocity)*0.8; //0.75*(p.velocity- 2*dot(normal, p.velocity)*normal);
+        }
+    }
+    return p.velocity;
+}
+
+[numthreads(4,1,1)] 
 void SimulateParticles (uint3 id : SV_DispatchThreadID)
 {
     if(NumParticles == 1){ return; /* zero length buffer guard*/ }
     Particle p = Particles[id.x];
 
     Particles[id.x].velocity += GravityOnParticle(p.position);
+    Particles[id.x].velocity = CollideWithBodies(Particles[id.x]);
+
     Particles[id.x].position += Particles[id.x].velocity;
 }
 

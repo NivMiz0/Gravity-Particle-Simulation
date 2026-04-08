@@ -423,7 +423,53 @@ MonoBehaviour:
   screenUI: {fileID: 284080522}
   compute: {fileID: 7200000, guid: 543da493d566b4017b3e816e33a0b41a, type: 3}
   backgroundColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
-  width: 256
+  width: 512
+--- !u!1 &1011633655
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1011633657}
+  - component: {fileID: 1011633656}
+  m_Layer: 0
+  m_Name: Planet (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1011633656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1011633655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b8005dde1d3d4e9193de2d0ff247027, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
+  radius: 16
+  mass: 10
+--- !u!4 &1011633657
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1011633655}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 103.1, y: -40, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1662226348
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,7 +499,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b8005dde1d3d4e9193de2d0ff247027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
-  radius: 9.11
+  radius: 16
+  mass: 5
 --- !u!4 &1662226350
 Transform:
   m_ObjectHideFlags: 0
@@ -463,7 +510,7 @@ Transform:
   m_GameObject: {fileID: 1662226348}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20.81, y: -19.14, z: 0}
+  m_LocalPosition: {x: -31.05, y: -40, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -498,7 +545,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b8005dde1d3d4e9193de2d0ff247027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
-  radius: 5.6
+  radius: 10.1
+  mass: 20
 --- !u!4 &2123242882
 Transform:
   m_ObjectHideFlags: 0
@@ -626,3 +674,4 @@ SceneRoots:
   - {fileID: 381518534}
   - {fileID: 1662226350}
   - {fileID: 2123242882}
+  - {fileID: 1011633657}

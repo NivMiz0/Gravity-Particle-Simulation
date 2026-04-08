@@ -40,15 +40,14 @@ public class RenderSimulation : MonoBehaviour
         SendPlanets();
         
         int numParticles;     
-        
         particlesList.Add(new Particle(new Vector2(0, 0), new Vector2(0f, -1f)));
         SendParticles(out numParticles);
         
-        compute.Dispatch(0,Mathf.CeilToInt(numParticles/8f), 1, 1); //Simulation Step
+        compute.Dispatch(0,Mathf.CeilToInt(numParticles/4f), 1, 1); //Simulation Step
         compute.Dispatch(1, Mathf.CeilToInt(width/8f), Mathf.CeilToInt(height/8f), 1); //Render to Screen
         
         Particle[] ps = new Particle[numParticles];
-        particlesBuffer.GetData(ps);
+        particlesBuffer.GetData(ps); // TODO:This is bad and slow. Track particles fully on GPU?
         particlesList = ps.ToList();
     }
     
@@ -57,6 +56,7 @@ public class RenderSimulation : MonoBehaviour
         PlanetComponent[] planets = FindObjectsByType<PlanetComponent>();
         Planet[] planetsData = planets.Select(p => p.GetData()).ToArray();
         
+        if(planetsBuffer != null) { planetsBuffer.Release(); planetsBuffer = null; }
         planetsBuffer = new ComputeBuffer(planets.Length, Planet.GetSize());
         planetsBuffer.SetData(planetsData);
         
@@ -75,6 +75,7 @@ public class RenderSimulation : MonoBehaviour
         }
         numParticles = particleData.Length;
         
+        if(particlesBuffer != null) { particlesBuffer.Release(); particlesBuffer = null; }
         particlesBuffer = new ComputeBuffer(particleData.Length, Particle.GetSize());
         particlesBuffer.SetData(particleData);
         
@@ -107,5 +108,5 @@ public class RenderSimulation : MonoBehaviour
         planetsBuffer.Release();
         particlesBuffer.Release();
     }
-    
 }
+ 
