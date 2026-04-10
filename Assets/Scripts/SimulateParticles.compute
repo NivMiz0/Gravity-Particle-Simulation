@@ -40,29 +40,13 @@ float4 RenderScene(uint2 pos)
     }
     for(int j = 0; j < NumParticles; j++)
     {
-        if(distance(pos, WorldToUV(Particles[j].position)) < 2 && NumParticles != 1 /*Zero length buffer guard*/)
+        if(distance(pos, WorldToUV(Particles[j].position)) < 1 && NumParticles != 1 /*Zero length buffer guard*/)
         {
             return float4(1.0, 1.0, 1.0,1.0);
         }
     }
 
     return BGColor;
-}
-
-Planet FindClosestPlanet(float2 pos)
-{
-    Planet closest = Planets[0];
-    float minDist = distance(closest.position, pos);
-    for(int i = 0; i < NumPlanets; i++)
-    {
-        float d = distance(pos, Planets[i].position);
-        if(d < minDist)
-        {
-            closest = Planets[i];
-            minDist = d;
-        } 
-    }
-    return closest;
 }
 
 float2 GravityOnParticle(float2 pos)
@@ -87,7 +71,7 @@ float2 CollideWithBodies(Particle p)
         if(distance(p.position, body.position) < body.radius)
         {
             float2 normal = normalize(p.position - body.position);
-            return normal*length(p.velocity)*0.8; //0.75*(p.velocity- 2*dot(normal, p.velocity)*normal);
+            return 0.75*(p.velocity- 2*dot(normal, p.velocity)*normal);
         }
     }
     return p.velocity;
