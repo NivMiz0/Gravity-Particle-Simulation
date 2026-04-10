@@ -1,5 +1,6 @@
 #pragma kernel SimulateParticles
-#pragma kernel RenderSimulation
+#pragma kernel RenderBackground
+#pragma kernel RenderParticles
 
 RWTexture2D<float4> Result;
 
@@ -38,7 +39,7 @@ float2 GravityOnParticle(float2 pos)
     return velocity;
 }
 
-float2 CollideWithBodies(Particle p)
+void CollideWithBodies(inout Particle p)
 {
     for(int i = 0; i < NumPlanets; i++)
     {
@@ -46,10 +47,15 @@ float2 CollideWithBodies(Particle p)
         if(distance(p.position, body.position) < body.radius)
         {
             float2 normal = normalize(p.position - body.position);
-            return 0.75*(p.velocity- 2*dot(normal, p.velocity)*normal);
+            p.position = body.position + normal*body.radius;
+
+            float vAlongNormal = dot(normal, p.velocity);
+            if(vAlongNormal < 0)
+            {
+                p.velocity = 0.55*(p.velocity- 1.8*vAlongNormal*normal);
+            }
         }
     }
-    return p.velocity;
 }
 
 [numthreads(4,1,1)] 
@@ -59,33 +65,49 @@ void SimulateParticles (uint3 id : SV_DispatchThreadID)
     Particle p = Particles[id.x];
 
     Particles[id.x].velocity += GravityOnParticle(p.position);
-    Particles[id.x].velocity = CollideWithBodies(Particles[id.x]);
+    CollideWithBodies(Particles[id.x]);
 
     Particles[id.x].position += Particles[id.x].velocity;
 }
 
-// float4 RenderScene(uint2 pos)
-// {
-//     for(int i = 0; i < NumPlanets; i++)
-//     {
-//         if(distance(pos, Planets[i].position) < Planets[i].radius)
-//         {
-//             return float4(1.0, 0.0, 0.0, 1.0);
-//         } 
-//     }
-//     for(int j = 1; j < NumParticles; j++)
-//     {
-//         if(distance(pos, Particles[j].position) < 1 && NumParticles != 1 /*Zero length buffer guard*/)
-//         {
-//             return float4(1.0, 1.0, 1.0,1.0);
-//         }
-//     }
-
-//     return BGColor;
-// }
-
 [numthreads(8,8,1)] 
-void RenderSimulation (uint3 id : SV_DispatchThreadID)
+void RenderBackground (uint3 id : SV_DispatchThreadID)
 {
-    Result[id.xy] = RenderScene(id.xy);
+    float4 color = BGColor;
+    for(int i = 0; i < NumPlanets; i++)
+    {
+        if(distance(id.xy, Planets[i].position) < Planets[i].radius)
+        {
+            color = float4(1.0, 0.0, 0.0, 1.0);
+        } 
+    }
+    Result[id.xy] = color;
+}
+
+[numthreads(64,1,1)] 
+void RenderParticles (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= NumParticles || id.x == 0) return;
+
+    uint2 center = uint2(Particles[id.x].position);
+    const float rad = 1;
+
+    for(int i = 0; i < NumPlanets; i++)
+    {
+        if(distance(center, Planets[i].position) < Planets[i].radius)
+        {
+            return;
+        } 
+    }
+
+    for(int x = center.x - ceil(rad); x <= center.x + ceil(rad); x++)
+    {
+        for(int y = center.y - ceil(rad); y <= center.y + ceil(rad); y++)
+        {
+            if(distance(Particles[id.x].position, uint2(x, y)) < rad)
+            {
+                Result[uint2(x, y)] = float4(1.0, 1.0, 1.0,1.0);
+            }
+        }
+    }
 }
