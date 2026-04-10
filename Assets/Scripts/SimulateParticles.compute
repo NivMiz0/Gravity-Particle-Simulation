@@ -24,34 +24,9 @@ struct Particle
 RWStructuredBuffer<Particle> Particles;
 int NumParticles;
 
-float2 WorldToUV(float2 world)
-{
-    return world + float2(WIDTH/2, HEIGHT/2);
-}
-
-float4 RenderScene(uint2 pos)
-{
-    for(int i = 0; i < NumPlanets; i++)
-    {
-        if(distance(pos, WorldToUV(Planets[i].position)) < Planets[i].radius)
-        {
-            return float4(1.0, 0.0, 0.0, 1.0);
-        } 
-    }
-    for(int j = 0; j < NumParticles; j++)
-    {
-        if(distance(pos, WorldToUV(Particles[j].position)) < 1 && NumParticles != 1 /*Zero length buffer guard*/)
-        {
-            return float4(1.0, 1.0, 1.0,1.0);
-        }
-    }
-
-    return BGColor;
-}
-
 float2 GravityOnParticle(float2 pos)
 {
-    const float G = 2; // Arbitrary "Universal gravity constant" 
+    const float G = 5; // Arbitrary "Universal gravity constant" 
     float2 velocity = float2(0.0, 0.0); 
     for(int i = 0; i < NumPlanets; i++)
     {
@@ -80,7 +55,7 @@ float2 CollideWithBodies(Particle p)
 [numthreads(4,1,1)] 
 void SimulateParticles (uint3 id : SV_DispatchThreadID)
 {
-    if(NumParticles == 1){ return; /* zero length buffer guard*/ }
+    if(id.x == 0) return;
     Particle p = Particles[id.x];
 
     Particles[id.x].velocity += GravityOnParticle(p.position);
@@ -88,6 +63,26 @@ void SimulateParticles (uint3 id : SV_DispatchThreadID)
 
     Particles[id.x].position += Particles[id.x].velocity;
 }
+
+// float4 RenderScene(uint2 pos)
+// {
+//     for(int i = 0; i < NumPlanets; i++)
+//     {
+//         if(distance(pos, Planets[i].position) < Planets[i].radius)
+//         {
+//             return float4(1.0, 0.0, 0.0, 1.0);
+//         } 
+//     }
+//     for(int j = 1; j < NumParticles; j++)
+//     {
+//         if(distance(pos, Particles[j].position) < 1 && NumParticles != 1 /*Zero length buffer guard*/)
+//         {
+//             return float4(1.0, 1.0, 1.0,1.0);
+//         }
+//     }
+
+//     return BGColor;
+// }
 
 [numthreads(8,8,1)] 
 void RenderSimulation (uint3 id : SV_DispatchThreadID)

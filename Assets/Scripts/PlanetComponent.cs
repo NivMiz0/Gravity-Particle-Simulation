@@ -5,9 +5,9 @@ class PlanetComponent : MonoBehaviour
 {
     [SerializeField] float radius;
     [SerializeField] float mass;
-    public Planet GetData()
+    public Planet GetData(int width, int height)
     {
-        return new Planet(transform.position, radius, mass);
+        return new Planet(HelperFuncs.WorldToUV(transform.position, width, height), radius, mass);
     }
 
     // void OnDrawGizmos()

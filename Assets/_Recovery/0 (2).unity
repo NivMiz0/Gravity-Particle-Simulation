@@ -499,8 +499,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b8005dde1d3d4e9193de2d0ff247027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
-  radius: 12
-  mass: 50
+  radius: 7.1
+  mass: 0
 --- !u!4 &1662226350
 Transform:
   m_ObjectHideFlags: 0

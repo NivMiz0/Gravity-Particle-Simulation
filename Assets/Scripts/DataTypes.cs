@@ -1,4 +1,13 @@
 using UnityEngine;
+
+public static class HelperFuncs
+{
+    public static Vector2 WorldToUV(Vector2 world, int width, int height)
+    {
+        return new Vector2(world.x*width/18 + width/2, world.y*height/10 + height/2);
+    }
+}
+
 [System.Serializable]
 public struct Planet
 {

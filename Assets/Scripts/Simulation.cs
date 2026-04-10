@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RenderSimulation : MonoBehaviour
+public class Simulation : MonoBehaviour
 {
     [SerializeField] RawImage screenUI;
     [SerializeField] ComputeShader compute;
@@ -16,6 +16,8 @@ public class RenderSimulation : MonoBehaviour
     ComputeBuffer planetsBuffer;
     ComputeBuffer particlesBuffer;
     List<Particle> particlesList;
+    
+    bool started = false;
 
     void OnEnable()
     {
@@ -24,37 +26,58 @@ public class RenderSimulation : MonoBehaviour
         particlesList = new List<Particle>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        StepSimulation();
+        if(started) return;
+        if(Input.GetMouseButtonDown(0))
+        {
+            for (int i = 0; i < 10000; i++)
+            {
+                Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
+                SpawnParticles(HelperFuncs.WorldToUV(p, width, height));
+            }
+        }
+        
+        if(Input.GetKey(KeyCode.Space))
+        {
+            FetchParticles();
+            print(particlesList.Count);
+            started = true;
+        }
     }
 
+    void FixedUpdate()
+    { 
+        RenderSimulation();
+        if(!started) return;
+        StepSimulation();
+    }
     
-    void StepSimulation()
+    void RenderSimulation()
     {
         if(screenTexture == null)
         {
             Init();
         }
-           
+        
         SendPlanets();
-        
-        int numParticles;     
-        particlesList.Add(new Particle(new Vector2(0, 0), new Vector2(0f, -1f)));
-        SendParticles(out numParticles);
-        
-        compute.Dispatch(0,Mathf.CeilToInt(numParticles/4f), 1, 1); //Simulation Step
         compute.Dispatch(1, Mathf.CeilToInt(width/8f), Mathf.CeilToInt(height/8f), 1); //Render to Screen
+    }
+    
+    void StepSimulation()
+    {           
+        // SendPlanets();
+        // SpawnParticles(HelperFuncs.WorldToUV(Vector2.zero, width, height));
+                
+        compute.Dispatch(0,Mathf.CeilToInt(particlesList.Count/4f), 1, 1); //Simulation Step
         
-        Particle[] ps = new Particle[numParticles];
-        particlesBuffer.GetData(ps); // TODO:This is bad and slow. Track particles fully on GPU?
-        particlesList = ps.ToList();
+        // FetchParticles(); 
     }
     
     void SendPlanets()
     {
         PlanetComponent[] planets = FindObjectsByType<PlanetComponent>();
-        Planet[] planetsData = planets.Select(p => p.GetData()).ToArray();
+        Planet[] planetsData = planets.Select(p => p.GetData(width, height)).ToArray();
         
         if(planetsBuffer != null) { planetsBuffer.Release(); planetsBuffer = null; }
         planetsBuffer = new ComputeBuffer(planets.Length, Planet.GetSize());
@@ -66,14 +89,15 @@ public class RenderSimulation : MonoBehaviour
         compute.SetInt("NumPlanets", planetsData.Length);
     }
     
-    void SendParticles(out int numParticles)
+    void SpawnParticles(Vector2 pos)
     {
-        Particle[] particleData = particlesList.ToArray();
-        if(particleData.Length == 0) //Zero length buffer guard
-        {
-            particleData = particleData.Append(new Particle(Vector2.zero, Vector2.zero)).ToArray();
-        }
-        numParticles = particleData.Length;
+        particlesList.Add(new Particle(pos, new Vector2(0f, -1)));
+        SendParticles(particlesList.ToArray());
+    }
+    
+    void SendParticles(Particle[] toSend)
+    {
+        Particle[] particleData = toSend;
         
         if(particlesBuffer != null) { particlesBuffer.Release(); particlesBuffer = null; }
         particlesBuffer = new ComputeBuffer(particleData.Length, Particle.GetSize());
@@ -83,6 +107,13 @@ public class RenderSimulation : MonoBehaviour
         compute.SetBuffer(1, "Particles", particlesBuffer);
         
         compute.SetInt("NumParticles", particleData.Length);
+    }
+    
+    void FetchParticles()
+    {
+        Particle[] ps = new Particle[particlesList.Count];
+        particlesBuffer.GetData(ps);
+        particlesList = ps.ToList();
     }
     
     void Init()
@@ -99,6 +130,9 @@ public class RenderSimulation : MonoBehaviour
         compute.SetVector("BGColor", backgroundColor);
         compute.SetInt("WIDTH", width);
         compute.SetInt("HEIGHT", height);
+        
+        particlesList.Add(new Particle(Vector2.zero, Vector2.zero));
+        SendParticles(particlesList.ToArray());
                 
         screenUI.texture = screenTexture;
     }
