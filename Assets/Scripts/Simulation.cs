@@ -17,7 +17,7 @@ public class Simulation : MonoBehaviour
     ComputeBuffer particlesBuffer;
     List<Particle> particlesList;
     
-    bool started = true;
+    bool doSimulation = false;
 
     void OnEnable()
     {
@@ -28,18 +28,18 @@ public class Simulation : MonoBehaviour
 
     void Update()
     {
-        if(started) return;
-        if(Input.GetMouseButton(0))
-        {
-            Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
-            SpawnParticles(HelperFuncs.WorldToUV(p, width, height));
-        }
-        
-        if(Input.GetKey(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.Space))
         {
             FetchParticles();
             print(particlesList.Count);
-            started = true;
+            doSimulation = !doSimulation;
+        }
+        if(doSimulation) return;
+        if(Input.GetMouseButton(0))
+        {
+            Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
+            print(p);
+            SpawnParticles(HelperFuncs.WorldToUV(p, width, height));
         }
         
     }
@@ -52,7 +52,7 @@ public class Simulation : MonoBehaviour
         }
         RenderBackground();
         RenderParticles();
-        if(!started) return;
+        if(!doSimulation) return;
         StepSimulation();
     }
     
@@ -67,7 +67,7 @@ public class Simulation : MonoBehaviour
     }
     
     void StepSimulation()
-    {           
+    {
         SpawnParticles(HelperFuncs.WorldToUV(Vector2.zero, width, height));
         compute.Dispatch(0,Mathf.CeilToInt(particlesList.Count/4f), 1, 1); //Simulation Step
         FetchParticles(); 

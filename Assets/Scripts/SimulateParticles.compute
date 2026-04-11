@@ -41,18 +41,20 @@ float2 GravityOnParticle(float2 pos)
 
 void CollideWithBodies(inout Particle p)
 {
+    const float frictionCoefficient = 0.85;
+    const float restitutionCoefficient = 0.85;
     for(int i = 0; i < NumPlanets; i++)
     {
         Planet body = Planets[i];
-        if(distance(p.position, body.position) < body.radius)
+        if(distance(p.position, body.position) < body.radius + 1)
         {
             float2 normal = normalize(p.position - body.position);
-            p.position = body.position + normal*body.radius;
+            p.position = body.position + normal*(body.radius + 1);
 
             float vAlongNormal = dot(normal, p.velocity);
             if(vAlongNormal < 0)
             {
-                p.velocity = 0.55*(p.velocity- 1.8*vAlongNormal*normal);
+                p.velocity = frictionCoefficient*(p.velocity- (1 + restitutionCoefficient)*vAlongNormal*normal);
             }
         }
     }
@@ -65,9 +67,8 @@ void SimulateParticles (uint3 id : SV_DispatchThreadID)
     Particle p = Particles[id.x];
 
     Particles[id.x].velocity += GravityOnParticle(p.position);
-    CollideWithBodies(Particles[id.x]);
-
     Particles[id.x].position += Particles[id.x].velocity;
+    CollideWithBodies(Particles[id.x]);
 }
 
 [numthreads(8,8,1)] 
@@ -90,15 +91,7 @@ void RenderParticles (uint3 id : SV_DispatchThreadID)
     if (id.x >= NumParticles || id.x == 0) return;
 
     uint2 center = uint2(Particles[id.x].position);
-    const float rad = 1;
-
-    for(int i = 0; i < NumPlanets; i++)
-    {
-        if(distance(center, Planets[i].position) < Planets[i].radius)
-        {
-            return;
-        } 
-    }
+    const float rad = 1; 
 
     for(int x = center.x - ceil(rad); x <= center.x + ceil(rad); x++)
     {
