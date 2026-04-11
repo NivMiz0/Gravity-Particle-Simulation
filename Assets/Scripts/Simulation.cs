@@ -38,8 +38,10 @@ public class Simulation : MonoBehaviour
         if(Input.GetMouseButton(0))
         {
             Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
-            print(p);
-            SpawnParticles(HelperFuncs.WorldToUV(p, width, height));
+            for (int i = 0; i < 100; i++)
+            {
+                SpawnParticles(HelperFuncs.WorldToUV(p + new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)), width, height));   
+            }
         }
         
     }
@@ -68,9 +70,9 @@ public class Simulation : MonoBehaviour
     
     void StepSimulation()
     {
-        SpawnParticles(HelperFuncs.WorldToUV(Vector2.zero, width, height));
+        // SpawnParticles(HelperFuncs.WorldToUV(Vector2.zero, width, height));
         compute.Dispatch(0,Mathf.CeilToInt(particlesList.Count/4f), 1, 1); //Simulation Step
-        FetchParticles(); 
+        // FetchParticles(); 
     }
     
     void SendPlanets()
