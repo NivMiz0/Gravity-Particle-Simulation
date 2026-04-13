@@ -1,22 +1,25 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Simulation : MonoBehaviour
 {
-    [SerializeField] RawImage screenUI;
     [SerializeField] ComputeShader compute;
+    [SerializeField] RawImage screenUI;
     Camera cam;
     RenderTexture screenTexture;
-    [SerializeField] Color backgroundColor;
     [SerializeField] int width;
     int height = 0;
-    
     ComputeBuffer planetsBuffer;
     ComputeBuffer particlesBuffer;
     List<Particle> particlesList;
-    
+    [SerializeField] float brushSize;
+    [SerializeField] Color backgroundColor;
+    [SerializeField] Gradient particleColorGrad;
+    ComputeBuffer gradientBuffer;
+    [SerializeField] float particleRadius;    
     bool doSimulation = false;
 
     void OnEnable()
@@ -40,9 +43,9 @@ public class Simulation : MonoBehaviour
             Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
             for (int i = 0; i < 100; i++)
             {
-                SpawnParticles(HelperFuncs.WorldToUV(p + new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)), width, height));   
-            }
-        }
+                SpawnParticles(HelperFuncs.WorldToUV(p + new Vector2(Random.Range(-brushSize/2f, brushSize/2f), Random.Range(-brushSize/2f, brushSize/2f)), width, height));   
+            } 
+       }
         
     }
 
@@ -70,9 +73,7 @@ public class Simulation : MonoBehaviour
     
     void StepSimulation()
     {
-        // SpawnParticles(HelperFuncs.WorldToUV(Vector2.zero, width, height));
         compute.Dispatch(0,Mathf.CeilToInt(particlesList.Count/4f), 1, 1); //Simulation Step
-        // FetchParticles(); 
     }
     
     void SendPlanets()
@@ -93,7 +94,7 @@ public class Simulation : MonoBehaviour
     
     void SpawnParticles(Vector2 pos)
     {
-        particlesList.Add(new Particle(pos, new Vector2(0f, -1)));
+        particlesList.Add(new Particle(pos, Vector2.down, particleRadius));
         SendParticles(particlesList.ToArray());
     }
     
@@ -134,7 +135,12 @@ public class Simulation : MonoBehaviour
         compute.SetInt("WIDTH", width); 
         compute.SetInt("HEIGHT", height);
         
-        particlesList.Add(new Particle(Vector2.zero, Vector2.zero));
+        gradientBuffer = new ComputeBuffer(particleColorGrad.colorKeyCount, sizeof(float)*4);
+        gradientBuffer.SetData(particleColorGrad.colorKeys.Select(c => c.color).ToArray());
+        compute.SetBuffer(2, "ParticleColorGradient", gradientBuffer);
+        compute.SetInt("NumParticleColors", particleColorGrad.colorKeyCount);
+        
+        particlesList.Add(new Particle(Vector2.zero, Vector2.zero, 0));
         SendParticles(particlesList.ToArray());
                 
         screenUI.texture = screenTexture;
@@ -142,8 +148,8 @@ public class Simulation : MonoBehaviour
 
     void OnDisable()
     {
-        planetsBuffer.Release();
-        particlesBuffer.Release();
+        planetsBuffer?.Release();
+        particlesBuffer?.Release();
     }
 }
  

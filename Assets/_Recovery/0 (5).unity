@@ -422,21 +422,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   compute: {fileID: 7200000, guid: 543da493d566b4017b3e816e33a0b41a, type: 3}
   screenUI: {fileID: 284080522}
-  width: 2048
-  brushSize: 4
+  width: 1024
+  brushSize: 1
   backgroundColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
   particleColorGrad:
     serializedVersion: 2
-    key0: {r: 0, g: 0.3077011, b: 1, a: 1}
-    key1: {r: 0, g: 1, b: 0.8213003, a: 1}
-    key2: {r: 0.9764706, g: 0.8383023, b: 0.023529395, a: 0}
-    key3: {r: 1, g: 0.08204004, b: 0, a: 0}
+    key0: {r: 0, g: 0.45917082, b: 1, a: 1}
+    key1: {r: 0, g: 1, b: 0.6233946, a: 1}
+    key2: {r: 0.9619608, g: 0.97708035, b: 0.02371341, a: 0}
+    key3: {r: 1, g: 0.16443041, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 21974
+    ctime1: 21627
     ctime2: 43253
     ctime3: 65535
     ctime4: 0
@@ -455,7 +455,6 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
-  particleRadius: 1.5
 --- !u!1 &1011633655
 GameObject:
   m_ObjectHideFlags: 0
@@ -533,8 +532,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
   radius: 27
-  mass: 100
-  color: {r: 1, g: 1, b: 1, a: 1}
+  mass: 50
+  color: {r: 1, g: 0, b: 0, a: 1}
 --- !u!4 &1662226350
 Transform:
   m_ObjectHideFlags: 0
@@ -544,7 +543,7 @@ Transform:
   m_GameObject: {fileID: 1662226348}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.58, y: -0.68, z: 0}
+  m_LocalPosition: {x: -1.18, y: -2.33, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

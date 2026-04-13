@@ -2,9 +2,6 @@
 #pragma kernel RenderBackground
 #pragma kernel RenderParticles
 
-RWTexture2D<float4> Result;
-
-float4 BGColor;
 int WIDTH;
 int HEIGHT;
  
@@ -13,7 +10,9 @@ struct Planet
     float2 position;
     float radius;
     float mass;
+    float4 color;
 };
+
 RWStructuredBuffer<Planet> Planets;
 int NumPlanets;
 
@@ -21,7 +20,9 @@ struct Particle
 {
     float2 position;
     float2 velocity;
+    float radius;
 };
+
 RWStructuredBuffer<Particle> Particles;
 int NumParticles;
 
@@ -46,10 +47,10 @@ void CollideWithBodies(inout Particle p)
     for(int i = 0; i < NumPlanets; i++)
     {
         Planet body = Planets[i];
-        if(distance(p.position, body.position) < body.radius + 1)
+        if(distance(p.position, body.position) < body.radius + p.radius)
         {
             float2 normal = normalize(p.position - body.position);
-            p.position = body.position + normal*(body.radius + 1);
+            p.position = body.position + normal*(body.radius + p.radius);
 
             float vAlongNormal = dot(normal, p.velocity);
             if(vAlongNormal < 0)
@@ -71,6 +72,9 @@ void SimulateParticles (uint3 id : SV_DispatchThreadID)
     CollideWithBodies(Particles[id.x]);
 }
 
+RWTexture2D<float4> Result;
+float4 BGColor;
+
 [numthreads(8,8,1)] 
 void RenderBackground (uint3 id : SV_DispatchThreadID)
 {
@@ -79,10 +83,19 @@ void RenderBackground (uint3 id : SV_DispatchThreadID)
     {
         if(distance(id.xy, Planets[i].position) < Planets[i].radius)
         {
-            color = float4(1.0, 0.0, 0.0, 1.0);
+            color = Planets[i].color;
         } 
     }
     Result[id.xy] = color;
+}
+
+RWStructuredBuffer<float4> ParticleColorGradient;
+int NumParticleColors;
+
+float4 SampleColorGradient(float time, int length, RWStructuredBuffer<float4> colors)
+{
+    float localSample = time*(length-1);
+    return lerp(colors[floor(localSample)], colors[ceil(localSample)], frac(localSample));
 }
 
 [numthreads(64,1,1)] 
@@ -91,7 +104,7 @@ void RenderParticles (uint3 id : SV_DispatchThreadID)
     if (id.x >= NumParticles || id.x == 0) return;
 
     uint2 center = uint2(Particles[id.x].position);
-    const float rad = 1; 
+    const float rad = Particles[id.x].radius; 
 
     for(int x = center.x - ceil(rad); x <= center.x + ceil(rad); x++)
     {
@@ -99,7 +112,7 @@ void RenderParticles (uint3 id : SV_DispatchThreadID)
         {
             if(distance(Particles[id.x].position, uint2(x, y)) < rad)
             {
-                Result[uint2(x, y)] = float4(1.0, 1.0, 1.0,1.0);
+                Result[uint2(x, y)] = SampleColorGradient(clamp(length(Particles[id.x].velocity/2.0), 0, 1) ,NumParticleColors, ParticleColorGradient);
             }
         }
     }

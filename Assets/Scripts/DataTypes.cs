@@ -14,15 +14,17 @@ public struct Planet
     public Vector2 position;
     public float radius;
     public float mass;
+    public Color color;
     public static int GetSize()
     {
-        return sizeof(float)*4;
+        return sizeof(float)*8;
     }
-    public Planet(Vector2 position, float radius, float mass)
+    public Planet(Vector2 position, float radius, float mass, Color color)
     {
         this.position = position;
         this.radius = radius;
         this.mass = mass;
+        this.color = color;
     }
 }
 
@@ -31,14 +33,16 @@ public struct Particle
 {
     public Vector2 position;
     public Vector2 velocity;
-    public Particle(Vector2 position, Vector2 velocity)
+    public float radius;
+    public Particle(Vector2 position, Vector2 velocity, float radius)
     {
         this.position = position;
         this.velocity = velocity;
+        this.radius = radius;
     }
     public static int GetSize()
     {
-        return sizeof(float)*4;
+        return sizeof(float)*5;
     }
     public override string ToString()
     {

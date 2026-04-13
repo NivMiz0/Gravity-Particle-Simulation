@@ -420,42 +420,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3742cc918e6de4412b4fcc30b8a14b72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  compute: {fileID: 7200000, guid: 543da493d566b4017b3e816e33a0b41a, type: 3}
   screenUI: {fileID: 284080522}
-  width: 2048
-  brushSize: 4
+  compute: {fileID: 7200000, guid: 543da493d566b4017b3e816e33a0b41a, type: 3}
   backgroundColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
-  particleColorGrad:
-    serializedVersion: 2
-    key0: {r: 0, g: 0.3077011, b: 1, a: 1}
-    key1: {r: 0, g: 1, b: 0.8213003, a: 1}
-    key2: {r: 0.9764706, g: 0.8383023, b: 0.023529395, a: 0}
-    key3: {r: 1, g: 0.08204004, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 21974
-    ctime2: 43253
-    ctime3: 65535
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 4
-    m_NumAlphaKeys: 2
-  particleRadius: 1.5
+  width: 1024
 --- !u!1 &1011633655
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,7 +455,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
   radius: 90
   mass: 60
-  color: {r: 1, g: 0, b: 0, a: 1}
 --- !u!4 &1011633657
 Transform:
   m_ObjectHideFlags: 0
@@ -533,8 +500,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
   radius: 27
-  mass: 100
-  color: {r: 1, g: 1, b: 1, a: 1}
+  mass: 50
 --- !u!4 &1662226350
 Transform:
   m_ObjectHideFlags: 0
@@ -544,7 +510,7 @@ Transform:
   m_GameObject: {fileID: 1662226348}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.58, y: -0.68, z: 0}
+  m_LocalPosition: {x: -3.48, y: -2.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -581,7 +547,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlanetComponent
   radius: 30
   mass: 40
-  color: {r: 1, g: 0, b: 0, a: 1}
 --- !u!4 &2123242882
 Transform:
   m_ObjectHideFlags: 0
