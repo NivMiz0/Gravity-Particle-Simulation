@@ -41,10 +41,7 @@ public class Simulation : MonoBehaviour
         if(Input.GetMouseButton(0))
         {
             Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
-            for (int i = 0; i < 100; i++)
-            {
-                SpawnParticles(HelperFuncs.WorldToUV(p + new Vector2(Random.Range(-brushSize/2f, brushSize/2f), Random.Range(-brushSize/2f, brushSize/2f)), width, height));   
-            } 
+            SpawnParticles(p, 10000, brushSize/2);   
        }
         
     }
@@ -68,12 +65,12 @@ public class Simulation : MonoBehaviour
     }
     void RenderParticles()
     {
-        compute.Dispatch(2, Mathf.CeilToInt(particlesList.Count/64f), 1, 1); //Render to Screen
+        compute.Dispatch(2, Mathf.Min(Mathf.CeilToInt(particlesList.Count/1024f), 65535), 1, 1); //Render to Screen
     }
     
     void StepSimulation()
     {
-        compute.Dispatch(0,Mathf.CeilToInt(particlesList.Count/4f), 1, 1); //Simulation Step
+        compute.Dispatch(0, Mathf.Min(Mathf.CeilToInt(particlesList.Count/1024f), 65535), 1, 1); //Simulation Step
     }
     
     void SendPlanets()
@@ -92,9 +89,13 @@ public class Simulation : MonoBehaviour
         compute.SetInt("NumPlanets", planetsData.Length);
     }
     
-    void SpawnParticles(Vector2 pos)
+    void SpawnParticles(Vector2 pos, int num, float randomOffset)
     {
-        particlesList.Add(new Particle(pos, Vector2.down, particleRadius));
+        for (int i = 0; i < num; i++)
+        {
+            Vector2 randomizedPos = HelperFuncs.WorldToUV(pos + new Vector2(Random.Range(-randomOffset, randomOffset), Random.Range(-randomOffset, randomOffset)), width, height);
+            particlesList.Add(new Particle(randomizedPos, Vector2.down, particleRadius));
+        }
         SendParticles(particlesList.ToArray());
     }
     
@@ -135,6 +136,7 @@ public class Simulation : MonoBehaviour
         compute.SetInt("WIDTH", width); 
         compute.SetInt("HEIGHT", height);
         
+        if(gradientBuffer != null) { gradientBuffer.Release(); gradientBuffer = null; }
         gradientBuffer = new ComputeBuffer(particleColorGrad.colorKeyCount, sizeof(float)*4);
         gradientBuffer.SetData(particleColorGrad.colorKeys.Select(c => c.color).ToArray());
         compute.SetBuffer(2, "ParticleColorGradient", gradientBuffer);
@@ -150,6 +152,7 @@ public class Simulation : MonoBehaviour
     {
         planetsBuffer?.Release();
         particlesBuffer?.Release();
+        gradientBuffer?.Release();
     }
 }
  

@@ -423,7 +423,7 @@ MonoBehaviour:
   compute: {fileID: 7200000, guid: 543da493d566b4017b3e816e33a0b41a, type: 3}
   screenUI: {fileID: 284080522}
   width: 2048
-  brushSize: 8
+  brushSize: 4
   backgroundColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
   particleColorGrad:
     serializedVersion: 2
@@ -455,7 +455,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
-  particleRadius: 1
+  particleRadius: 1.5
 --- !u!1 &1011633655
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,7 +544,7 @@ Transform:
   m_GameObject: {fileID: 1662226348}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.58, y: -0.68, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
