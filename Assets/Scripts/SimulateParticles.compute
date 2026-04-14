@@ -61,7 +61,7 @@ void CollideWithBodies(inout Particle p)
     }
 }
 
-[numthreads(1024,1,1)] 
+[numthreads(64,1,1)] 
 void SimulateParticles (uint3 id : SV_DispatchThreadID)
 {
     if(id.x == 0) return;
@@ -98,12 +98,14 @@ float4 SampleColorGradient(float time, int length, RWStructuredBuffer<float4> co
     return lerp(colors[floor(localSample)], colors[ceil(localSample)], frac(localSample));
 }
 
-[numthreads(1024,1,1)] 
+[numthreads(64,1,1)] 
 void RenderParticles (uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= NumParticles || id.x == 0) return;
 
     uint2 center = uint2(Particles[id.x].position);
+    if(center.x < 0 || center.y < 0 || center.x > WIDTH || center.y > HEIGHT) return;
+
     const float rad = Particles[id.x].radius; 
 
     for(int x = center.x - ceil(rad); x <= center.x + ceil(rad); x++)
