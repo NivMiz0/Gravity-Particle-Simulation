@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,7 +18,7 @@ public class Simulation : MonoBehaviour
     [SerializeField] Color backgroundColor;
     [SerializeField] Gradient particleColorGrad;
     ComputeBuffer gradientBuffer;
-    [SerializeField] float particleRadius;    
+    [SerializeField] float particleRadius;   
     bool doSimulation = false;
 
     void OnEnable()
@@ -41,9 +40,8 @@ public class Simulation : MonoBehaviour
         if(Input.GetMouseButton(0))
         {
             Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
-            SpawnParticles(p, 10000, brushSize/2);   
+            SpawnParticles(p, 10000, brushSize/2, (vec) => new Vector2(-vec.y, vec.x).normalized);   
        }
-        
     }
 
     void FixedUpdate()
@@ -89,12 +87,13 @@ public class Simulation : MonoBehaviour
         compute.SetInt("NumPlanets", planetsData.Length);
     }
     
-    void SpawnParticles(Vector2 pos, int num, float randomOffset)
+    void SpawnParticles(Vector2 pos, int num, float randomOffset, System.Func<Vector2, Vector2> initialVelocityField)
     {
         for (int i = 0; i < num; i++)
         {
-            Vector2 randomizedPos = HelperFuncs.WorldToUV(pos + new Vector2(Random.Range(-randomOffset, randomOffset), Random.Range(-randomOffset, randomOffset)), width, height);
-            particlesList.Add(new Particle(randomizedPos, Vector2.down, particleRadius));
+            Vector2 worldPos = pos + new Vector2(Random.Range(-randomOffset, randomOffset), Random.Range(-randomOffset, randomOffset));
+            Vector2 pixelCoords = HelperFuncs.WorldToPixelCoords(worldPos, width, height);
+            particlesList.Add(new Particle(pixelCoords, initialVelocityField(worldPos), particleRadius));
         }
         SendParticles(particlesList.ToArray());
     }

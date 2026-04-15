@@ -1,8 +1,11 @@
+using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using System.Linq;
 
 public static class HelperFuncs
 {
-    public static Vector2 WorldToUV(Vector2 world, int width, int height)
+    public static Vector2 WorldToPixelCoords(Vector2 world, int width, int height)
     {
         return new Vector2(world.x*width/18 + width/2, world.y*height/10 + height/2);
     }

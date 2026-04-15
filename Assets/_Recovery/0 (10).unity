@@ -423,7 +423,7 @@ MonoBehaviour:
   compute: {fileID: 7200000, guid: 543da493d566b4017b3e816e33a0b41a, type: 3}
   screenUI: {fileID: 284080522}
   width: 2048
-  brushSize: 4.44
+  brushSize: 8
   backgroundColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
   particleColorGrad:
     serializedVersion: 2
