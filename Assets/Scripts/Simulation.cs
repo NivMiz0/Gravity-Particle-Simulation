@@ -40,7 +40,7 @@ public class Simulation : MonoBehaviour
         if(Input.GetMouseButton(0))
         {
             Vector2 p = cam.ScreenToWorldPoint(Input.mousePosition);
-            SpawnParticles(p, 10000, brushSize/2, (vec) => new Vector2(-vec.y, vec.x).normalized);   
+            SpawnParticles(p, 5000, brushSize/2, (vec) => new Vector2(-vec.y, vec.x).normalized);   
        }
     }
 
@@ -63,12 +63,12 @@ public class Simulation : MonoBehaviour
     }
     void RenderParticles()
     {
-        compute.Dispatch(2, Mathf.Min(Mathf.CeilToInt(particlesList.Count/64f), 65535), 1, 1); //Render to Screen
+        compute.Dispatch(2, Mathf.Min(Mathf.CeilToInt(particlesList.Count/128f), 65535), 1, 1); //Render to Screen
     }
     
     void StepSimulation()
     {
-        compute.Dispatch(0, Mathf.Min(Mathf.CeilToInt(particlesList.Count/64f), 65535), 1, 1); //Simulation Step
+        compute.Dispatch(0, Mathf.Min(Mathf.CeilToInt(particlesList.Count/128f), 65535), 1, 1); //Simulation Step
     }
     
     void SendPlanets()

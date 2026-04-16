@@ -61,7 +61,7 @@ void CollideWithBodies(inout Particle p)
     }
 }
 
-[numthreads(64,1,1)] 
+[numthreads(128,1,1)] 
 void SimulateParticles (uint3 id : SV_DispatchThreadID)
 {
     if(id.x == 0) return;
@@ -98,7 +98,7 @@ float4 SampleColorGradient(float time, int length, RWStructuredBuffer<float4> co
     return lerp(colors[floor(localSample)], colors[ceil(localSample)], frac(localSample));
 }
 
-[numthreads(64,1,1)] 
+[numthreads(128,1,1)] 
 void RenderParticles (uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= NumParticles || id.x == 0) return;
